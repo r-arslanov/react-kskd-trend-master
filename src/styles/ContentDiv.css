@@ -1,0 +1,85 @@
+.ContentDiv{ 
+  text-align: center;
+  width:100%;
+  height:100%;
+}
+
+.HeaderDiv{
+  margin-left: 5px;
+}
+
+.Picker{
+  display: flex;
+  /* justify-content: space-between; */
+  align-items: center;
+  padding: 5px;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+  height: 81px;
+  /* display: none; */
+}
+
+.TimePicker{
+  /* height: 43px; */
+  z-index: 2;
+}
+
+.DateTimeRangePicker{
+  height: 65px;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+.DropDownDate{
+  margin-left: 10px;
+  width: 300px;
+  height: 36px;
+}
+
+.Button{
+  margin-left: auto;
+  height: 36px;
+}
+
+.ui.selection.dropdown{
+  min-height: 35px;
+}
+
+.Trends {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.legends {
+  min-height: 90px;
+  text-align: left;
+  padding-left: 50px;
+}
+
+.legend {
+  height: 10px;
+}
+
+.Loader {
+  height: 200px;
+  z-index: 1;
+}
+
+/* div.tooltip {
+  position: absolute;
+  text-align: center;
+  width: 60px;
+  height: 28px;
+  padding: 2px;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+} */
+/*
+@media (max-width: 1000px) {
+  .Picker {
+    display: none;
+  }
+}
+*/

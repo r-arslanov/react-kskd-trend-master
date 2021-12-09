@@ -1,0 +1,9 @@
+.Objects-List{
+    /* max-height: 20vh;
+    min-height: 20vh; */
+    margin-bottom: 2px;
+    height: 20%;
+    overflow: auto;
+    overflow-x: hidden;
+    border: 1px solid rgba(34, 36, 38, 0.15);
+}

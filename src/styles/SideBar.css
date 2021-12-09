@@ -1,0 +1,18 @@
+.ControlDiv{
+    flex: 0.7 600px;
+    /* width: fit-content; */
+    min-height: 100%;
+    min-width: 200px;
+    max-width: 400px;
+    text-align: left;
+  }
+
+  .DDList{
+    margin-bottom: 5px;
+  }
+
+  @media (max-width: 1000px) {
+    .ControlDiv {
+      display: none;
+    }
+  }

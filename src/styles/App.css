@@ -1,0 +1,15 @@
+.App {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  padding: 5px 5px 5px 5px;
+  align-items: stretch;
+  min-height: 100vh;
+  max-height: 100vh;
+}
+
+.TextHeader{
+  color: blue;
+}
+
+
