@@ -35,7 +35,6 @@ class ContentDiv_local extends Component {
             clearInterval(this.interval)
             Rest.getHistory(this.props.data.kust, this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
                 {this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false})})
-            //this.getHistory(response => { this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false})});
             if(this.state.disabled){
                 this.interval = setInterval(() => {Rest.getHistory(this.props.data.kust,  this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
                     {this.updateStates(response)})}, 2000)
@@ -44,7 +43,7 @@ class ContentDiv_local extends Component {
     }
 
     componentDidMount(){
-        if(this.props.parametrized){
+        if(this.props.parametrized || this.props.oneValue){
             this.setState({dateStart: new Date(new Date().setHours(new Date().getHours() - hours)), dateEnd: new Date()});
         }
     }
@@ -73,7 +72,7 @@ class ContentDiv_local extends Component {
     }
 
     paramRender(){
-        if(this.props.parametrized){
+        if(this.props.parametrized || this.props.oneValue){
             return (this.state.data.length !== 0) ? < TrendsInOneChart data={this.state.data} switchAct={() => this.switchAct()}/> : <h1>Нет данных</h1>;
         }else{
             return (this.state.data.length !== 0) ? < TrendsZoomAndPointer data={this.state.data}/> : <h1>Нет данных</h1>;
@@ -85,7 +84,7 @@ class ContentDiv_local extends Component {
         return(
             <div className="ContentDiv" id="content">
                 <div className = "HeaderDiv">
-                    <div className = "Picker" style={this.props.parametrized ? styles.default : styles.default}>
+                    <div className = "Picker" style={this.props.parametrized ? styles.invisible : styles.default}>
                         <div className="TimePicker">
                             <TimePicker
                                 dateStart = {this.state.dateStart} dateEnd = {this.state.dateEnd}
@@ -118,8 +117,8 @@ const ContenDiv = (props) => {
             sys + ":" + sys + "=SUECN_" + num + ".AI.Zagruzka_dvigatelya_",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Napryazhenie_na_vykhode_PCH",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_A",
-            // this.props.uri_param.sys + ":" + this.props.uri_param.sys + "=SUECN_" + this.props.uri_param.num + ".AI.Tok_fazy_B",
-            // this.props.uri_param.sys + ":" + this.props.uri_param.sys + "=SUECN_" + this.props.uri_param.num + ".AI.Tok_fazy_C"
+            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
+            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
         ];
     }
 
@@ -132,7 +131,7 @@ const ContenDiv = (props) => {
     let data = props.data;
         data.kust = l_kust;
         data.dps = l_dps;
-    return <ContentDiv_local data={data} uri_param={{sys, type, num, dp}} parametrized={(sys !== undefined)} /> ;
+    return <ContentDiv_local data={data} uri_param={{sys, type, num, dp}} parametrized={(type !== undefined)} oneValue={dp !== undefined} /> ;
 }
 
 const styles = {

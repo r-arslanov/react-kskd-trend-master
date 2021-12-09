@@ -21,7 +21,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "nbuild": "nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -r \"build/**/*\" -o \"\\\\192.168.30.103/Kaskad_projects/CENTRAL_OIL/bin/server\"",
+    "nbuild": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -r \"build/**/*\" -o \"./build/out/kaskad_trend\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
