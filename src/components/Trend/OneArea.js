@@ -96,7 +96,6 @@ function addGraph(props, l_height, sumstat){
     clip.append("rect")
             .attr("width", svg_width - props.margin.right)
             .attr("height", svg_height - props.margin.top *3)
-            // .attr("transform", `translate(${props.margin.left}, ${props.margin.right} )` );
 
     let path = d_line.append("path")
                         .attr("clip-path", `url(#${c_id})`)
@@ -117,7 +116,6 @@ function addGraph(props, l_height, sumstat){
                                             });
             graph.select(".axis--x").call(d3.axisBottom(newX).tickFormat(multiFormat));
             rescaledX = newX;
-            // this.props.switchAct();
         });
     
     svg.call(zoom);

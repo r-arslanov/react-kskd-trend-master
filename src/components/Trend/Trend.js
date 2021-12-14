@@ -35,12 +35,9 @@ function renderAreas(props, size){
     let unKey = 1;
     let result = []
     sumstat.forEach((val, key, map)=>{
-        // console.log(val, key, map)
-
         result.push(<OneArea key={unKey} div={genUnId("trend-")} size={size_area} data={val} />)
         unKey++;
     });
-    console.log(result);
     return result;
 }
 
