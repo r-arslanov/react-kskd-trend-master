@@ -66,7 +66,7 @@ export default class SideBar extends Component {
     render(){
         //console.log("state.kusts", this.state.kusts);
         return(
-            <div className="ControlDiv">
+            <div className="ControlDiv" id={"sidebar-div"}>
                 {(this.state.kusts.length !== 0) ? <DropDownList data={this.state.kusts} label="Номер куста" onChange={(e, {value}) => this.updKust(value)}/> : < Loader />}
                 {(this.state.types.length !== 0) ? <DropDownList data={this.state.types} label="Объект" onChange={(e, {value}) => this.updType(value)}/> : < Loader />}
                 {(this.state.objects.length !== 0) ? <ObjList data={this.state.objects} onChange={(value) => this.updObject(value)}/> : ""}

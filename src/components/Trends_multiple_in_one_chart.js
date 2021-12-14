@@ -90,21 +90,20 @@ export default class Trends extends React.Component {
 
         // Calculate Margins and canvas dimensions
         console.log(d3.select(".Picker").node().getBoundingClientRect());
-        let size_top_bar = d3.select(".Picker").node().getBoundingClientRect().height;
+        let size_top_bar = d3.select(".Picker").node().getBoundingClientRect();
+        let size_left_bar = d3.select(".ControlDiv").node().getBoundingClientRect();
+        console.log(d3.select(".ControlDiv").node().getBoundingClientRect());
         let dim_res = this.getWindowDimensions();
-        let margin = {top: 10, right: 40, bottom: 40, left: 40},
+        let margin = {top: 10, right: 10, bottom: 0, left: 30},
             root_m = {top: 5, right: 5, bottom: 5, left: 5},
-            width = dim_res.width - margin.left - margin.right,
-            height = dim_res.height - margin.top - margin.bottom,
             
-            svg_width = dim_res.width - root_m.left - root_m.right*2,
-            svg_height = dim_res.height - root_m.top - root_m.bottom*2 - size_top_bar,
+            svg_width = dim_res.width - (root_m.left - root_m.right) - (margin.left - margin.right) - size_left_bar.width,
+            svg_height = dim_res.height - (root_m.top - root_m.bottom) - (margin.top - margin.bottom) - size_top_bar.height,
             
             y_max = d3.max(data, (d) => { return +d.value; }),
             y_min = d3.min(data, (d) => { return +d.value; });
         
         console.log("==========================================");
-        console.log(dim_res, margin, width, height, `this is height: ${height}`);
         console.log('sumstat', sumstat)
         console.log("==========================================");
         // color palette
@@ -113,8 +112,7 @@ export default class Trends extends React.Component {
 // ====================================== start legend ================================
         const lsvg = d3.select("#my_dataviz")
                         .append("svg")
-                            .attr("width", svg_width)
-                            .attr("height", 20)
+                            .attr("width", "100%")
                             .style("background-color", "#dddddd")
         let counter = 0, cur_line = 0;
         sumstat.forEach((value, key, map) => {
@@ -132,13 +130,13 @@ export default class Trends extends React.Component {
         });
         d3.select("#my_dataviz").selectChildren("svg").attr("height", (cur_line+1) * 20);
         svg_height -= (cur_line+1) * 25;
-        
+        console.log(`svg_width ${svg_width}, svg_height ${svg_height}, cur_line: ${(cur_line+1) * 25} , dim_res ${dim_res.width} x ${dim_res.height}`)
 // ================================ start graph =========================================
 
         const svg = d3.select("#my_dataviz")
                         .append("svg")
                             .attr("width", '100%')
-                            // .attr("height", '100%')
+                            .attr("height", svg_height)
                             .attr('viewBox', '0 0 ' + svg_width + ' ' + svg_height)
                             .attr('preserveAspectRatio', 'xMaxYMin')
         
@@ -262,7 +260,7 @@ mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
     let mouse = d3.pointer(event);
     d3.select(".mouse-line")
       .attr("d", function() {
-        var d = "M" + mouse[0] + "," + height;
+        var d = "M" + mouse[0] + "," + svg_height;
         d += " " + mouse[0] + "," + 0;
         return d;
       });

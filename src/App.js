@@ -9,10 +9,11 @@ const App = () => {
   const [data, setdata] = useState({ kust: "", dps: [] });
   return (
     <div className="App"> 
-      <SideBar transferData={object => setdata(object)}/>
+      <SideBar transferData={object => setdata(object)} />
       <Routes>
           <Route exact path="/one/:sys/:dp" element={<ContentDiv data={data} />}/>
           <Route exact path="/few/:sys/:type/:num" element={<ContentDiv data={data} />}/>
+          <Route exact path="/test" element={<ContentDiv test={true} data={data} />} />
           <Route exact path="/" element={<ContentDiv data={data} />} />
       </Routes>
     </div>

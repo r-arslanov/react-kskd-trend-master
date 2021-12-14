@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
 import TimePicker from './TimePicker';
 import DropDownList from './DropDownList';
-//import Trends from './Trends';
-//import TrendsZoom from './Trends_zoom';
 import TrendsZoomAndPointer from './Trends_zoom_and_pointer';
 import TrendsInOneChart from './Trends_multiple_in_one_chart';
-// import Loader from './Loader'
+import {Trend} from './Trend/Trend';
 import {Button} from 'semantic-ui-react'
 import {Rest} from '../lib/Rest';
-// import { Switch, Routes, Route } from "react-router-dom";
 
 import './../styles/ContentDiv.css';
 import './../Semantic-UI-CSS-master/semantic.css';
@@ -16,7 +13,6 @@ import './../Semantic-UI-CSS-master/semantic.css';
 import {useParams} from "react-router";
 
 const hours = 120;
-const debug = false;
 
 class ContentDiv_local extends Component {
 
@@ -72,18 +68,20 @@ class ContentDiv_local extends Component {
     }
 
     paramRender(){
-        if(this.props.parametrized || this.props.oneValue){
+        console.log(this.props)
+        if(this.props.test){
+            return <Trend data={this.state.data} />
+        }else if(this.props.parametrized || this.props.oneValue){
             return (this.state.data.length !== 0) ? < TrendsInOneChart data={this.state.data} switchAct={() => this.switchAct()}/> : <h1>Нет данных</h1>;
         }else{
             return (this.state.data.length !== 0) ? < TrendsZoomAndPointer data={this.state.data}/> : <h1>Нет данных</h1>;
         }
-
     }
 
     render(){
         return(
             <div className="ContentDiv" id="content">
-                <div className = "HeaderDiv">
+                <div className = "HeaderDiv" id={"header-div"}>
                     <div className = "Picker" style={this.props.parametrized ? styles.invisible : styles.default}>
                         <div className="TimePicker">
                             <TimePicker
@@ -95,13 +93,14 @@ class ContentDiv_local extends Component {
                         <div className = "DropDownDate">
                             <DropDownList label="Time" data = {this.dropDownData} onChange={(e, {value}) => this.setTime(value)} />
                         </div>
-                        <div className="Button">
+                        <div className="Button" >
                             <Button onClick={() => this.setState({needUpdate: true})}  content='Обновить' />
                         </div>
                     </div>
-                    <div className = "Trends">
+                </div>
+                
+                <div className = "Trends">
                         {this.paramRender()}
-                    </div>
                 </div>
             </div>
         )
@@ -117,8 +116,8 @@ const ContenDiv = (props) => {
             sys + ":" + sys + "=SUECN_" + num + ".AI.Zagruzka_dvigatelya_",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Napryazhenie_na_vykhode_PCH",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_A",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
+            // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
+            // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
         ];
     }
 
@@ -131,13 +130,14 @@ const ContenDiv = (props) => {
     let data = props.data;
         data.kust = l_kust;
         data.dps = l_dps;
-    return <ContentDiv_local data={data} uri_param={{sys, type, num, dp}} parametrized={(type !== undefined)} oneValue={dp !== undefined} /> ;
+
+    return <ContentDiv_local uri_param={{sys, type, num, dp}} parametrized={(type !== undefined)} oneValue={dp !== undefined} {...props}/> ;
 }
 
 const styles = {
     invisible:{
         display:"none"
-    },
+    }
 };
 
 export default ContenDiv;

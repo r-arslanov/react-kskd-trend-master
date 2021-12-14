@@ -1,4 +1,4 @@
-const root_ip = "https://192.168.30.103";
+const root_ip = "https://ioneft1";
 class Rest{
     
     //Забираем с сервера список кустов    
@@ -16,7 +16,6 @@ class Rest{
     //Забираем с сервера типы объектов (СУЭЦН, ГЗУ, АИ и т.д.)
     getTypes(cbTypes){
         let url = root_ip + "/getTypes";
-        //192.168.30.103
             fetch(url,{
                 method: "GET"
             }).then(raw =>{
