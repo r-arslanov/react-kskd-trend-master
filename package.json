@@ -23,7 +23,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "nbuild": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -o \"./build/kaskad_trend\"",
+    "nbuild": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -o \"./kaskad_trend\"",
     "nbuild_orig": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -r \"build/**/*\" -o \"./build/out/kaskad_trend\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

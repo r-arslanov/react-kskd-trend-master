@@ -62,7 +62,6 @@ function addGraph(props, l_height, sumstat){
     y_hst = (y_max - y_min) * 0.05;
     y_max += y_hst;
     y_min -= y_hst;
-    console.log(y_max, y_min, props.data)
     let {svg_width, svg_height} = {svg_width:  props.size.width - props.margin.left - props.margin.right,
         svg_height: props.size.height - props.margin.top - props.margin.bottom - l_height}
         
@@ -144,7 +143,7 @@ function addGraph(props, l_height, sumstat){
 }
 
 function addPointer(props, sumstat, svgs, size, axis){
-    console.log(svgs);
+    let blocked = false;
     let local_graph_id = svgs.graph.nodes()[0].id;
     let moe_id = genUnId("moe-"),
         mol_id = genUnId("mol-"),
@@ -162,8 +161,6 @@ function addPointer(props, sumstat, svgs, size, axis){
                     .style("stroke-width", "1px");
 
     let lines = svgs.svg.selectAll("path.line").nodes();
-    console.log("====================================================================");
-    console.log(lines)
     let mousePerLine = mouseG.selectAll('.mouse-per-line')
                                 .data(sumstat)
                                 .enter()
@@ -177,20 +174,20 @@ function addPointer(props, sumstat, svgs, size, axis){
                 .style("stroke-width", "1px")
                 .style("opacity", "0"); // opacity 1 - original
 
-    mousePerLine.append("rect")
-                    .attr("class", "tooltip")
-                    .attr("transform", "translate(10,3)")
-                    .style("fill", function(d) { return colorPalete(d[0]); })
+    // mousePerLine.append("rect")
+    //                 .attr("class", "tooltip")
+    //                 .attr("transform", "translate(10,3)")
+    //                 .style("fill", function(d) { return colorPalete(d[0]); })
 
-    mousePerLine.append("text")
-                .attr("id", "val-text")
-                .attr("transform", "translate(10,3)")
+    // mousePerLine.append("text")
+    //             .attr("id", "val-text")
+    //             .attr("transform", "translate(10,3)")
                 
-    mousePerLine.append("text")
-                    .attr("id", "date-text")
-                    .attr("transform", "translate(10,3)")
-                    // .style("fill", function(d) { return color(d[0]); })
+    // mousePerLine.append("text")
+    //                 .attr("id", "date-text")
+    //                 .attr("transform", "translate(10,3)")
     
+    let tooltip_g = mouseG.append("g");
     mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
                 .attr("id", mov_id)
                 .attr('width', size.svg_width) // can't catch mouse events on a g element
@@ -208,6 +205,7 @@ function addPointer(props, sumstat, svgs, size, axis){
                             .style("opacity", "0.8");
                 })
                 .on('mousemove', function(event) { // mouse moving over canvas]
+                    if (blocked) return;
                     let mouse = d3.pointer(event);
                     mouseG.select(".mouse-line")
                     .attr("d", function() {
@@ -215,7 +213,9 @@ function addPointer(props, sumstat, svgs, size, axis){
                             d += " " + mouse[0] + "," + 0;
                             return d;
                         });
-                    
+                    let poses = [];
+                    let objects = [];
+
                     mouseG.selectAll(".mouse-per-line")
                                 .attr("transform", (d, i) =>{
                                     let xDate = axis.x.invert(mouse[0]),
@@ -236,59 +236,80 @@ function addPointer(props, sumstat, svgs, size, axis){
                                         else if (pos.x < mouse[0]) beginning = target;
                                         else break; //position found
                                     }
-                                    let str_time = axis.x.invert(pos.x).toLocaleString();
                                     // old rect comment=================================================
-                                    mouseG.select(`#mpl-${i}`).selectAll("#val-text")
-                                            .text(axis.y.invert(pos.y).toFixed(2))
-                                            .attr("transform", "translate(15,18)");
-                                    mouseG.select(`#mpl-${i}`).selectAll("#date-text")
-                                            .text(str_time)
-                                            .attr("transform", "translate(15,38)")
-                                    let w_text = svgs.svg.selectAll("g.mouse-per-line").nodes()[i].childNodes[3].getBBox().width + 10;
+                                    // let str_time = axis.x.invert(pos.x).toLocaleString();
+                                    // mouseG.select(`#mpl-${i}`).selectAll("#val-text")
+                                    //         .text(axis.y.invert(pos.y).toFixed(2))
+                                    //         .attr("transform", "translate(15,18)");
+                                    // mouseG.select(`#mpl-${i}`).selectAll("#date-text")
+                                    //         .text(str_time)
+                                    //         .attr("transform", "translate(15,38)")
+                                    // pos.color = colorPalete[d[0]];
+                                    poses.push(pos);
+                                    objects.push({color: colorPalete(d[0]), comment: d[0]});
+                                    return "translate(" + mouse[0] + "," + pos.y +")";
+                                });
+                                
+                                tooltip_g.selectAll("text").remove();
+                                tooltip_g.selectAll("rect").remove();
 
+                                tooltip_g.append("rect")
+                                                .attr("id", "tool-rec")
+                                                .style("opacity", "0.8")
+                                                .attr("fill", "#ddd");
+                                poses.forEach((pos, i, arr) => {
+                                    tooltip_g.append("text")
+                                                        .attr("transform", "translate(10,"+ ((60*i) +20) +")")
+                                                        .attr("stroke", objects[i].color)
+                                                        .attr("fill", objects[i].color)
+                                                        .text(objects[i].comment);
+                                    tooltip_g.append("text")
+                                                        .attr("transform", "translate(10,"+ ((60*i)+20  + 20) +")")
+                                                        .attr("stroke", objects[i].color)
+                                                        .attr("fill", objects[i].color)
+                                                        .text(axis.x.invert(pos.x).toLocaleString());
+                                    tooltip_g.append("text")
+                                                        .attr("transform", "translate(10,"+ ((60*i)+40 +20) +")")
+                                                        .attr("stroke", objects[i].color)
+                                                        .attr("fill", objects[i].color)
+                                                        .text(axis.y.invert(pos.y).toFixed(2));
+                                    // if(i<arr.length-1){
+                                    //     tooltip_g.append("text")
+                                    //                         .attr("transform", "translate(10,"+ ((80*i)+60 + 20) +")")
+                                    //                         .text("------");
+                                    // }
+                                });
+
+                                let tooltip_size = tooltip_g.node().getBBox();
+                                tooltip_g.select("rect")
+                                                .attr("width", ()=> { return tooltip_size.width + 20; })
+                                                .attr("height", () => { return tooltip_size.height + 10; });
+                                
+                                tooltip_g.attr("transform", ()=>{
+                                    let x = d3.max(poses, (pos)=>{return pos.x}) + 10;
+                                    let y = d3.mean(poses, (pos)=>{return pos.y}) + 5;
                                     let clip_size = {width: svgs.clip.node().childNodes[0].width.baseVal.value,
                                                      height: svgs.clip.node().childNodes[0].height.baseVal.value}
 
-                                    mouseG.select(`#mpl-${i}`).selectAll("rect.tooltip")
-                                            .attr('width', w_text)
-                                            .attr('height', 40)
-
-                                    // let trans_x = (w_text+mouse[0] >= clip_size.width-50) ? w_text : 0;
-                                    // let trans_y = (pos.y + 60 <= clip_size.height) ? 60 : 0;
-                                    
-                                    let trans_x = [
-                                        (w_text+mouse[0] >= clip_size.width-50) ? w_text*-1 - 10 : 10,
-                                        (w_text+mouse[0] >= clip_size.width-50) ? w_text*-1 - 5 : 15,
-                                        (w_text+mouse[0] >= clip_size.width-50) ? w_text*-1 - 5 : 15
-                                    ];
-
-                                    let trans_y = [
-                                        (pos.y + 60 >= clip_size.height) ? 60*-1+3 : 3,
-                                        (pos.y + 60 >= clip_size.height) ? 60*-1+18 : 18,
-                                        (pos.y + 60 >= clip_size.height) ? 60*-1+38 : 38
-                                    ];
-
-                                    mouseG.select(`#mpl-${i}`).selectAll("rect.tooltip")
-                                            .attr("transform", `translate(${trans_x[0]}, ${trans_y[0]})`);
-                                    mouseG.select(`#mpl-${i}`).selectAll("#val-text")
-                                            .attr("transform", `translate(${trans_x[1] }, ${trans_y[1]})`);
-                                    mouseG.select(`#mpl-${i}`).selectAll("#date-text")
-                                            .attr("transform", `translate(${trans_x[2]}, ${trans_y[2]})`);
-                                    
-                                    // old rect comment=================================================
-                                    // mouseG.select(`#mpl-${i}`).selectAll("#val-text").remove();
-                                    // mouseG.select(`#mpl-${i}`).selectAll("#date-text").remove();
-                                    // mouseG.select(`#mpl-${i}`).selectAll("rect.tooltip").remove();
-                                    
-                                    // mouseG.select(`#mpl-${i}`).append("rect")
-                                    //                                 .attr("class", "tooltip")
-                                    //                                 .attr("fill", "#ddd")
-                                    //                                 // .attr("fill", (d) => {return colorPalete(d[0]); })
-                                    //                                 .attr("opacity", 0.8)
-                                    //                                 .attr("width", 100)
-                                    //                                 .attr("height", 100)
-                                    return "translate(" + mouse[0] + "," + pos.y +")";
+                                    if((x + tooltip_size.width) >= clip_size.width - 20) { x= x - (tooltip_size.width + 20) - 20; }
+                                    if((y + tooltip_size.height >= clip_size.height)) { y= y - (tooltip_size.height) - 10 }
+                                    return `translate(${x},${y})`
                                 });
+                    })
+                    .on("click", (event)=>{
+                        blocked = !blocked;
+                        if(blocked){
+                            mouseG.append("circle")
+                                        .attr("id", "circle-stopper")
+                                        .attr("r", 7)
+                                        .style("stroke", "#000")
+                                        .style("fill", "#f00" )
+                                        .style("stroke-width", "1px")
+                                        .style("opacity", "1"); // opacity 1 - original
+                        }else{
+                            mouseG.select("#circle-stopper").remove();
+
+                        }
                     });   
 }
 

@@ -6,8 +6,6 @@ import ContentDiv from './components/ContenDiv';
 import { Routes, Route } from "react-router-dom";
 
 const App = () => {
-  let url = window.__INITIAL_HEADERS__;
-  console.log(url)
   const [data, setdata] = useState({ kust: "", dps: [] });
   return (
     <div className="App"> 

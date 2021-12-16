@@ -117,8 +117,8 @@ const ContenDiv = (props) => {
             sys + ":" + sys + "=SUECN_" + num + ".AI.Zagruzka_dvigatelya_",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Napryazhenie_na_vykhode_PCH",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_A",
-            // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
-            // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
+            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
+            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
         ];
     }
 
