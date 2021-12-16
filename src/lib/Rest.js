@@ -1,8 +1,9 @@
-const root_ip = "https://ioneft1";
+const root_ip = window.root_ip;
+// import 'config.js'
 class Rest{
-    
     //Забираем с сервера список кустов    
     getKusts(cbTypes){
+        console.log("from process.env.REACT_APP_ROOT_URI", root_ip);
         let url = root_ip + "/getKusts";
             fetch(url,{
                 method: "GET"

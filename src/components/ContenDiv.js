@@ -1,8 +1,6 @@
 import React, {Component} from 'react';
 import TimePicker from './TimePicker';
 import DropDownList from './DropDownList';
-import TrendsZoomAndPointer from './Trends_zoom_and_pointer';
-import TrendsInOneChart from './Trends_multiple_in_one_chart';
 import {Trend} from './Trend/Trend';
 import {Button} from 'semantic-ui-react'
 import {Rest} from '../lib/Rest';
@@ -69,13 +67,15 @@ class ContentDiv_local extends Component {
 
     paramRender(){
         console.log(this.props)
-        if(this.props.test){
-            return <Trend data={this.state.data} />
-        }else if(this.props.parametrized || this.props.oneValue){
-            return (this.state.data.length !== 0) ? < TrendsInOneChart data={this.state.data} switchAct={() => this.switchAct()}/> : <h1>Нет данных</h1>;
-        }else{
-            return (this.state.data.length !== 0) ? < TrendsZoomAndPointer data={this.state.data}/> : <h1>Нет данных</h1>;
-        }
+        let oneArea = (this.props.uri_param.v_type === '2' || (this.props.parametrized || this.props.oneValue));
+        return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
+        // if(this.props.test){
+        //     return <Trend data={this.state.data} />
+        // }else if(this.props.parametrized || this.props.oneValue){
+        //     return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
+        // }else{
+        //     return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
+        // }
     }
 
     render(){
@@ -108,7 +108,8 @@ class ContentDiv_local extends Component {
 }
 
 const ContenDiv = (props) => {
-    const {sys, type, num, dp} = useParams();
+    const {sys, type, num, dp, v_type} = useParams();
+    console.log("uri_init", {sys, type, num, dp, v_type})
     let dps_from_type;
     if(type !== undefined && type.toUpperCase() === "SUECN"){
         dps_from_type = [
@@ -131,7 +132,7 @@ const ContenDiv = (props) => {
         data.kust = l_kust;
         data.dps = l_dps;
 
-    return <ContentDiv_local uri_param={{sys, type, num, dp}} parametrized={(type !== undefined)} oneValue={dp !== undefined} {...props}/> ;
+    return <ContentDiv_local uri_param={{sys, type, num, dp, v_type}} parametrized={(type !== undefined)} oneValue={dp !== undefined} {...props}/> ;
 }
 
 const styles = {

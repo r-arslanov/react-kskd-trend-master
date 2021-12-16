@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^12.8.3",
     "@wojtekmaj/react-datetimerange-picker": "^3.4.2",
     "d3": "^7.1.1",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -22,7 +23,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "nbuild": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -r \"build/**/*\" -o \"./build/out/kaskad_trend\"",
+    "nbuild": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -o \"./build/kaskad_trend\"",
+    "nbuild_orig": "npm run build & nexe --build \"windows-x86-14.15.3\" -i ./src/server/server.js -r \"build/**/*\" -o \"./build/out/kaskad_trend\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

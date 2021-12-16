@@ -30,14 +30,23 @@ function renderAreas(props, size){
     let sumstat = getSumstat(props.data);
     let size_area = {
         width: size.width,
-        height: size.height / sumstat.size
+        height: size.height
     }
-    let unKey = 1;
     let result = []
-    sumstat.forEach((val, key, map)=>{
-        result.push(<OneArea key={unKey} div={genUnId("trend-")} size={size_area} data={val} />)
-        unKey++;
-    });
+    if(!props.oneArea){
+        size_area = {
+            width: size.width,
+            height: size.height / sumstat.size
+        }
+
+        let unKey = 1;
+        sumstat.forEach((val, key, map)=>{
+            result.push(<OneArea key={unKey} div={genUnId("trend-")} size={size_area} data={val} />)
+            unKey++;
+        });
+    }else{
+        result = [<OneArea div={genUnId("trend-")} size={size_area} data={props.data} />]
+    }
     return result;
 }
 
@@ -58,6 +67,7 @@ export function Trend(props){
 }
 
 Trend.defaultProps = {
+    oneArea: false,
     header_id:"header-div",
     sidebar_id:"sidebar-div",
     r_margin,
