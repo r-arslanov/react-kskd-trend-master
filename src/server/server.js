@@ -25,7 +25,7 @@ const root = require("path").join(__dirname, "./../../build");
 app.use(express.static(root));
 app.get("*", (req, res) => {
     console.log('request url', req.url);
-    res.sendFile(path.join(__dirname+'/../../index.html'));
+    // res.sendFile(path.join(__dirname+'/../../index.html'));
     // res.sendFile(path.join(__dirname+'/../../build/index.html'), "params");
-    // res.sendFile("index.html", { root });
+    res.sendFile("index.html", { root });
 });

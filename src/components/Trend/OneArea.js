@@ -259,18 +259,21 @@ function addPointer(props, sumstat, svgs, size, axis){
                                                 .attr("fill", "#ddd");
                                 poses.forEach((pos, i, arr) => {
                                     tooltip_g.append("text")
-                                                        .attr("transform", "translate(10,"+ ((60*i) +20) +")")
-                                                        .attr("stroke", objects[i].color)
+                                                        .attr("transform", "translate(10,"+ ((40*i) +12) +")")
+                                                        .style("font-size", "12")
+                                                        // .attr("stroke", objects[i].color)
                                                         .attr("fill", objects[i].color)
                                                         .text(objects[i].comment);
                                     tooltip_g.append("text")
-                                                        .attr("transform", "translate(10,"+ ((60*i)+20  + 20) +")")
-                                                        .attr("stroke", objects[i].color)
+                                                        .attr("transform", "translate(10,"+ ((40*i)+12  + 12) +")")
+                                                        .style("font-size", "12")
+                                                        // .attr("stroke", objects[i].color)
                                                         .attr("fill", objects[i].color)
                                                         .text(axis.x.invert(pos.x).toLocaleString());
                                     tooltip_g.append("text")
-                                                        .attr("transform", "translate(10,"+ ((60*i)+40 +20) +")")
-                                                        .attr("stroke", objects[i].color)
+                                                        .attr("transform", "translate(10,"+ ((40*i)+24 +12) +")")
+                                                        .style("font-size", "12")
+                                                        // .attr("stroke", objects[i].color)
                                                         .attr("fill", objects[i].color)
                                                         .text(axis.y.invert(pos.y).toFixed(2));
                                     // if(i<arr.length-1){
@@ -283,7 +286,7 @@ function addPointer(props, sumstat, svgs, size, axis){
                                 let tooltip_size = tooltip_g.node().getBBox();
                                 tooltip_g.select("rect")
                                                 .attr("width", ()=> { return tooltip_size.width + 20; })
-                                                .attr("height", () => { return tooltip_size.height + 10; });
+                                                .attr("height", () => { return tooltip_size.height + 5; });
                                 
                                 tooltip_g.attr("transform", ()=>{
                                     let x = d3.max(poses, (pos)=>{return pos.x}) + 10;

@@ -3,6 +3,7 @@ import TimePicker from './TimePicker';
 import DropDownList from './DropDownList';
 import {Trend} from './Trend/Trend';
 import {Button} from 'semantic-ui-react'
+import Loader from './../components/Loader'
 import {Rest} from '../lib/Rest';
 
 import './../styles/ContentDiv.css';
@@ -14,21 +15,34 @@ const hours = 120;
 
 class ContentDiv_local extends Component {
 
-    state = {dateStart: new Date(new Date().setHours(new Date().getHours() - hours)), dateEnd: new Date(), disabled: false, data: [], dps: [], needUpdate: false};
+    state = {
+        dateStart: new Date(new Date().setHours(new Date().getHours() - hours)), 
+        dateEnd: new Date(), 
+        disabled: false, 
+        data: [], 
+        dps: [], 
+        needUpdate: false, 
+        isLoading:true
+    };
+    
     interval;
 
     updateStates(response){
         this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false,
             dateStart: new Date(this.state.dateStart.setMilliseconds(this.state.dateStart.getMilliseconds() + 2000)),
-            dateEnd: new Date(this.state.dateEnd.setMilliseconds(this.state.dateEnd.getMilliseconds() + 2000))
+            dateEnd: new Date(this.state.dateEnd.setMilliseconds(this.state.dateEnd.getMilliseconds() + 2000)),
+            isLoading:false
          })
     }
 
     componentDidUpdate(){
         if((this.props.data.dps.length > 0 & this.state.dateStart < this.state.dateEnd & this.props.data.dps !== this.state.dps) || this.state.needUpdate){
             clearInterval(this.interval)
+            if(!this.state.isLoading){
+            this.setState({isLoading:true});
             Rest.getHistory(this.props.data.kust, this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
-                {this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false})})
+                {this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false, isLoading:false})})
+            }
             if(this.state.disabled){
                 this.interval = setInterval(() => {Rest.getHistory(this.props.data.kust,  this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
                     {this.updateStates(response)})}, 2000)
@@ -68,7 +82,10 @@ class ContentDiv_local extends Component {
     paramRender(){
         console.log(this.props)
         let oneArea = (this.props.uri_param.v_type === '2' || (this.props.parametrized || this.props.oneValue));
-        return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
+        if(!this.state.isLoading)
+            return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
+        else
+            return <Loader />;
         // if(this.props.test){
         //     return <Trend data={this.state.data} />
         // }else if(this.props.parametrized || this.props.oneValue){
@@ -117,8 +134,8 @@ const ContenDiv = (props) => {
             sys + ":" + sys + "=SUECN_" + num + ".AI.Zagruzka_dvigatelya_",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Napryazhenie_na_vykhode_PCH",
             sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_A",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
+            // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
+            // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
         ];
     }
 
