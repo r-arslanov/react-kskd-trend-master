@@ -32,6 +32,7 @@ export default class SideBar extends Component {
     updSelected(value){
         let temp = this.state.dps;
         temp[value-1].enabled = !temp[value-1].enabled
+        console.log("selected dps", temp)
         this.setState({dps: temp, needTransfer: true})
     }
 
@@ -46,14 +47,40 @@ export default class SideBar extends Component {
     //При необходимости (needUpdate: true) считываем список объектов и записываем в state
     componentDidUpdate(){
         if(this.state.needUpdate){
-            Rest.getObjects(this.state.kust, this.state.type, response => { this.setState({ objects: response.objects, dps: response.dps, needUpdate: false }) } );
-            // this.getObjects(response => { this.setState({ objects: response.objects, dps: response.dps, needUpdate: false }) });
+            Rest.getObjects(this.state.kust, this.state.type, response => {
+                // console.log("need update", response);
+                let arr_dps = Array();
+                response.dps.forEach((dp, index)=>{
+                    arr_dps.push(this.state.kust + ":" + this.state.kust + "=" + this.state.type + "_1." + dp.dp);
+                });
+
+                Rest.getGroup(arr_dps, (res2)=>{
+                    // console.log("res2", res2);
+                    res2.forEach((gp)=>{
+                        let tmp = gp.dp.replace(this.state.kust + ":" + this.state.kust + "=" + this.state.type + "_1.", "");
+                        response.dps.forEach((one_dp, index)=>{
+                            if(tmp === one_dp.dp){
+                                response.dps[index].gp = gp.group;
+                            }
+                        });
+                    });
+                    this.setState({ 
+                        objects: response.objects, 
+                        dps: response.dps, 
+                        needUpdate: false 
+                    });
+                });
+            });
         }
         
         //При необходимости передаем данные в App.js
         if(this.state.needTransfer) {
             let transData = {kust: this.state.kust, dps: []}
-            this.state.dps.forEach(dp => { if(dp.enabled) { transData.dps.push(this.state.object + dp.dp) } })
+            this.state.dps.forEach(dp => { 
+                if(dp.enabled) { 
+                    transData.dps.push({dp:this.state.object + dp.dp, gp:dp.gp}) 
+                } 
+            });
             this.props.transferData(transData);
             this.setState({needTransfer: false})
         } 

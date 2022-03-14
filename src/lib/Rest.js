@@ -39,15 +39,40 @@ class Rest{
             cbTypes(response);
         }).catch((e) => console.log('Error: ' + e.message));
         };
+    //Получаем архивную группу для точек данных
+    getGroup(dps, cbGroup){
+        let url = root_ip + "/getGroup?";
+            dps.forEach((dp, index)=>{
+                url+= (index === 0) ?  "dp" + index + "=" + dp :  "&dp" + index + "=" + encodeURIComponent(dp);
+            });
+        console.log("URL", url);
+        fetch(url, {
+            method: "GET"
+        }).then(raw =>{
+            return raw.json();
+        }).then(response=>{
+            cbGroup(response);
+        }).catch((e) => {
+            console.log('Error: ' + e.message);
+        });
+    }
 
     getHistory(kust, dateStart, dateEnd, dps, cbTypes){
-            let url = root_ip + "/getHistory?";
-            url += "sys=" + encodeURI(kust + ":");
-            url += "&start=" + encodeURI(parseInt(dateStart.getTime()/1000));
-            url += "&end=" + encodeURI(parseInt(dateEnd.getTime()/1000));
+        let url = root_ip + "/getHistory?";
+        url += "sys=" + encodeURI(kust + ":");
+        url += "&start=" + encodeURI(parseInt(dateStart.getTime()/1000));
+        url += "&end=" + encodeURI(parseInt(dateEnd.getTime()/1000));
+        var count = 0;
+        console.log("getHistory called", dps);
+        if(dps[0] === undefined){
+            cbTypes({data: []});
+            return;
+        }else{
             dps.forEach((dp, index) => {
-                url += "&dp" + index + "=" + encodeURIComponent(dp)
+                url += "&dp" + index + "=" + encodeURIComponent(kust + ":" + dp.dp);
+                url += "&grp" + index + "=" + encodeURIComponent(dp.gp);
             });
+            
             console.log("URL", url);
             fetch(url,{
                 method: "GET"
@@ -59,6 +84,7 @@ class Rest{
             }).catch((e) => {
                 console.log('Error: ' + e.message);
             });
+        }
     };
 }
 

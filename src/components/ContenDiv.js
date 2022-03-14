@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useState} from 'react';
 import TimePicker from './TimePicker';
 import DropDownList from './DropDownList';
 import {Trend} from './Trend/Trend';
@@ -22,7 +22,7 @@ class ContentDiv_local extends Component {
         data: [], 
         dps: [], 
         needUpdate: false, 
-        isLoading:true
+        isLoading:false
     };
     
     interval;
@@ -39,9 +39,9 @@ class ContentDiv_local extends Component {
         if((this.props.data.dps.length > 0 & this.state.dateStart < this.state.dateEnd & this.props.data.dps !== this.state.dps) || this.state.needUpdate){
             clearInterval(this.interval)
             if(!this.state.isLoading){
-            this.setState({isLoading:true});
-            Rest.getHistory(this.props.data.kust, this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
-                {this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false, isLoading:false})})
+                this.setState({isLoading:true});
+                Rest.getHistory(this.props.data.kust, this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
+                    {this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false, isLoading:false})});
             }
             if(this.state.disabled){
                 this.interval = setInterval(() => {Rest.getHistory(this.props.data.kust,  this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
@@ -80,7 +80,8 @@ class ContentDiv_local extends Component {
     }
 
     paramRender(){
-        console.log(this.props)
+        console.log("======= props =======", this.props)
+        console.log("======= state =======", this.state);
         let oneArea = (this.props.uri_param.v_type === '2' || (this.props.parametrized || this.props.oneValue));
         if(!this.state.isLoading)
             return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
@@ -125,31 +126,67 @@ class ContentDiv_local extends Component {
 }
 
 const ContenDiv = (props) => {
+    const [gpIsLoading, setGpIsLoading] = useState(false);
+    const [gpIsLoaded, setGpIsLoaded] = useState(false);
+    const [needLoading, setNeedLoading] = useState(false);
+    const [stDps, setStDps] = useState([]);
     const {sys, type, num, dp, v_type} = useParams();
-    console.log("uri_init", {sys, type, num, dp, v_type})
+
+    console.log("uri_init", {sys, type, num, dp, v_type});
     let dps_from_type;
     if(type !== undefined && type.toUpperCase() === "SUECN"){
         dps_from_type = [
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Vkhod_1)",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Zagruzka_dvigatelya_",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Napryazhenie_na_vykhode_PCH",
-            sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_A",
+            {dp: sys + "=SUECN_" + num + ".AI.Vkhod_1)", gp: "EV_SUECN", key: 1 },
+            {dp: sys + "=SUECN_" + num + ".AI.Zagruzka_dvigatelya_", gp: "EV_SUECN", key: 2 },
+            {dp: sys + "=SUECN_" + num + ".AI.Napryazhenie_na_vykhode_PCH", gp: "EV_SUECN", key: 3 },
+            {dp: sys + "=SUECN_" + num + ".AI.Tok_fazy_A", gp: "EV_SUECN", key: 4 }
             // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_B",
             // sys + ":" + sys + "=SUECN_" + num + ".AI.Tok_fazy_C"
         ];
     }
 
     let l_kust = (props.data.kust !== '') ? props.data.kust :  sys;
+    
+    // console.log("======= dp =======", {sys, type, num, dp, v_type});
+    if(dp !== undefined && !(gpIsLoaded || gpIsLoading) && !needLoading){
+        setNeedLoading(true);
+    }
+
+    if(dp !== undefined && needLoading && !gpIsLoading && !gpIsLoaded){
+        setGpIsLoading(true);
+
+        Rest.getGroup([l_kust + ":" + dp], (res)=>{
+            setStDps(res);
+            setGpIsLoaded(true);
+        });
+    }
 
     let l_dps =  (props.data.dps.length > 0) ? props.data.dps : 
-               (dps_from_type !== undefined)  ? dps_from_type : 
-                                               [dp];
+                                                    (dps_from_type !== undefined)  ? dps_from_type : [{dp, gp:"EV_SUECN"}];
 
     let data = props.data;
         data.kust = l_kust;
         data.dps = l_dps;
-
-    return <ContentDiv_local uri_param={{sys, type, num, dp, v_type}} parametrized={(type !== undefined)} oneValue={dp !== undefined} {...props}/> ;
+    if(needLoading ){
+        let l_dps = [];
+        stDps.forEach(one=>{
+            console.log(one);
+            l_dps.push({dp:one.dp.replace(l_kust + ":", ""), gp:one.group});
+        });
+        data.dps = l_dps;
+        console.log("======= data =======", data);
+        return (gpIsLoaded) ? <ContentDiv_local uri_param={{sys, type, num, dp, v_type}} parametrized={(type !== undefined)} oneValue={dp !== undefined} data={data} {...props}/> : <Loader />
+    }else{
+        if(stDps.length > 0){
+            let l_dps = [];
+            stDps.forEach(one=>{
+                l_dps.push({dp:one.dp.replace(l_kust + ":", ""), gp:one.gp});
+            });
+        }
+        console.log("======= data =======", data);
+        return <ContentDiv_local uri_param={{sys, type, num, dp, v_type}} parametrized={(type !== undefined)} oneValue={dp !== undefined} data={data} {...props}/> ;
+    }
+    
 }
 
 const styles = {
