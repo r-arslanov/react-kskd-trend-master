@@ -1,5 +1,5 @@
 .DpListContainer{
-    height: 70%;
+    max-height: 90%;
     overflow: scroll;
     overflow-x: hidden;
     border: 1px solid rgba(34, 36, 38, 0.15);

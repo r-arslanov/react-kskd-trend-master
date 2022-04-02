@@ -11,7 +11,8 @@ import './../Semantic-UI-CSS-master/semantic.css';
 
 import {useParams} from "react-router";
 
-const hours = 120;
+// const hours = 120; // this is 5 days
+const hours = 1; // this is 1 hour
 
 class ContentDiv_local extends Component {
 
@@ -24,28 +25,47 @@ class ContentDiv_local extends Component {
         needUpdate: false, 
         isLoading:false
     };
-    
-    interval;
 
     updateStates(response){
         this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false,
-            dateStart: new Date(this.state.dateStart.setMilliseconds(this.state.dateStart.getMilliseconds() + 2000)),
-            dateEnd: new Date(this.state.dateEnd.setMilliseconds(this.state.dateEnd.getMilliseconds() + 2000)),
+            dateStart: new Date(this.state.dateStart.setMilliseconds(this.state.dateStart.getMilliseconds() + 60000)),
+            dateEnd: new Date(this.state.dateEnd.setMilliseconds(this.state.dateEnd.getMilliseconds() + 60000)),
             isLoading:false
          })
+    }
+    timer;
+    startFetching(me){
+        console.log("startFetching");
+        function updResponseState(response){
+            if(me.state.disabled){
+                console.log("updResponseState");
+                let l_range = me.state.dateEnd - me.state.dateStart;
+                let l_dEnd = Date.now() + 1000;
+                let l_dStart = (l_dEnd - l_range) + 1000;
+                console.log(l_range, l_dStart, l_dEnd);
+                me.setState({
+                    dateStart: new Date(l_dStart),
+                    dateEnd: new Date(l_dEnd)
+                });
+                me.timer = setTimeout(me.startFetching, 1000, me);
+            }
+
+            me.setState({
+                    data: response.data, 
+                    dps: me.props.data.dps, 
+                    needUpdate: false, 
+                    isLoading:false
+                })
+
+        }
+        Rest.getHistory(me.props.data.kust, me.state.dateStart, me.state.dateEnd, me.props.data.dps, updResponseState);
     }
 
     componentDidUpdate(){
         if((this.props.data.dps.length > 0 & this.state.dateStart < this.state.dateEnd & this.props.data.dps !== this.state.dps) || this.state.needUpdate){
-            clearInterval(this.interval)
             if(!this.state.isLoading){
+                this.startFetching(this);
                 this.setState({isLoading:true});
-                Rest.getHistory(this.props.data.kust, this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
-                    {this.setState({data: response.data, dps: this.props.data.dps, needUpdate: false, isLoading:false})});
-            }
-            if(this.state.disabled){
-                this.interval = setInterval(() => {Rest.getHistory(this.props.data.kust,  this.state.dateStart, this.state.dateEnd, this.props.data.dps, response => 
-                    {this.updateStates(response)})}, 2000)
             }
         }
     }
@@ -76,7 +96,7 @@ class ContentDiv_local extends Component {
     }
 
     switchAct(){
-        clearInterval(this.interval);
+        clearTimeout(this.timer);
     }
 
     paramRender(){
@@ -87,13 +107,6 @@ class ContentDiv_local extends Component {
             return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
         else
             return <Loader />;
-        // if(this.props.test){
-        //     return <Trend data={this.state.data} />
-        // }else if(this.props.parametrized || this.props.oneValue){
-        //     return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
-        // }else{
-        //     return (this.state.data.length !== 0) ? < Trend data={this.state.data} switchAct={() => this.switchAct()} oneArea={oneArea}/> : <h1>Нет данных</h1>;
-        // }
     }
 
     render(){
